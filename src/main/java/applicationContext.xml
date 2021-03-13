@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	
+	<context:component-scan base-package="tommy.spring.polymorphism">
+	</context:component-scan>
+	
+	<bean id="apple" class="tommy.spring.polymorphism.AppleSpeaker"></bean>
+	
+	<!-- <bean id="collectionBean" class="tommy.spring.collection.CollectionBean">
+		<property name="addressList">
+			<list>
+				<value>서울시 서초구 서초동</value>
+				<value>서울시 서초구 반포동</value>
+				<value>서울시 동대문구 장안동</value>
+			</list>  
+			<map>
+				<entry>
+					<key><value>홍길동</value></key>
+					<value>율도국</value>
+				</entry>
+				<entry>
+					<key><value>손오공</value></key>
+					<value>화과산</value>
+				</entry>
+				<entry>
+					<key><value>삼장법사</value></key>
+					<value>인도</value>
+				</entry>
+			</map>
+			<set value-type="java.lang.String">
+				<value>서울시 서초구 서초동</value>
+				<value>서울시 동대문구 장안동</value>
+				<value>서울시 동대문구 장안동</value>
+				<value>서울시 서초구 반포동</value>
+			</set>
+		</property>
+	</bean>
+	
+	<bean id="tv" class="tommy.spring.polymorphism.SamsungTV" p:speaker-ref="sony" p:price="2800000">
+	</bean>
+	<bean id="sony" class="tommy.spring.polymorphism.SonySpeaker"></bean>
+	<bean id="apple" class="tommy.spring.polymorphism.AppleSpeaker"></bean>  -->
+</beans>

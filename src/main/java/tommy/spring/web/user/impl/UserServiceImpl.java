@@ -8,6 +8,7 @@ import tommy.spring.web.user.UserVO;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
+	
 	@Autowired
 	private UserDAO userDAO;
 	

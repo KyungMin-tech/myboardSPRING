@@ -7,20 +7,18 @@ import org.springframework.stereotype.Service;
 
 import tommy.spring.web.board.BoardService;
 import tommy.spring.web.board.BoardVO;
-import tommy.spring.web.common.Log4JAdvice;
-import tommy.spring.web.common.LogAdvice;
 
 @Service("boardService")
 public class BoardServiceImpl implements BoardService {
 	@Autowired
-	private BoardDAO boardDAO;
+	private BoardDAOSpring boardDAO;
 	
 
 	@Override
 	public void insertBoard(BoardVO vo) {
-		if(vo.getSeq() == 0) {
-			throw new IllegalArgumentException("0번 글은 등록 할 수 없습니다.");
-		}
+//		if(vo.getSeq() == 0) {
+//			throw new IllegalArgumentException("0번 글은 등록 할 수 없습니다.");
+//		}
 		boardDAO.insertBoard(vo);
 	}
 

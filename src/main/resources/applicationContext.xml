@@ -5,75 +5,67 @@
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
-	
-	
-	<context:component-scan base-package="tommy.spring.web"></context:component-scan>
-	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
-	
-	<!-- 
-	<bean id="log" class="tommy.spring.web.common.Log4JAdvice"></bean>
-	<bean id="around" class="tommy.spring.web.common.AroundAdvice"></bean>
-	<aop:config>
-		<aop:pointcut expression="execution(* tommy.spring.web..*Impl.*(..))" id="allPointcut"/> 
-		<aop:pointcut expression="execution(* tommy.spring.web..*Impl.get*(..))" id="getPointcut"/>
-		<aop:aspect ref="around">
-			<aop:around method="aroundLog" pointcut-ref="getPointcut" />
-		</aop:aspect>
-	</aop:config>
-	
-	
-	<bean id="userService" class="tommy.spring.web.user.impl.UserServiceImpl">
-		<property name="userDAO" ref="userDAO" />
-	</bean>
-	<bean id="userDAO" class="tommy.spring.web.user.impl.UserDAO"></bean>
-	
-	
-	<bean id="myLifeBean" class="tommy.spring.lifecycle.MyLifeBeanImpl" init-method="init">
-		<property name="greeting"><value>Hello, </value></property>
-	</bean>
-	<bean class="tommy.spring.lifecycle.CustomBeanPostProcessor"></bean>
-	
-	
-	<context:component-scan base-package="tommy.spring.polymorphism">
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+
+	<context:component-scan base-package="tommy.spring.web">
 	</context:component-scan>
-	
-	<bean id="apple" class="tommy.spring.polymorphism.AppleSpeaker"></bean>
-	
-	<bean id="collectionBean" class="tommy.spring.collection.CollectionBean">
-		<property name="addressList">
-			<list>
-				<value>서울시 서초구 서초동</value>
-				<value>서울시 서초구 반포동</value>
-				<value>서울시 동대문구 장안동</value>
-			</list>  
-			<map>
-				<entry>
-					<key><value>홍길동</value></key>
-					<value>율도국</value>
-				</entry>
-				<entry>
-					<key><value>손오공</value></key>
-					<value>화과산</value>
-				</entry>
-				<entry>
-					<key><value>삼장법사</value></key>
-					<value>인도</value>
-				</entry>
-			</map>
-			<set value-type="java.lang.String">
-				<value>서울시 서초구 서초동</value>
-				<value>서울시 동대문구 장안동</value>
-				<value>서울시 동대문구 장안동</value>
-				<value>서울시 서초구 반포동</value>
-			</set>
-		</property>
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	<!-- DataSource 등록 -->
+	<context:property-placeholder location="classpath:config/database.properties" />
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
 	</bean>
-	
-	<bean id="tv" class="tommy.spring.polymorphism.SamsungTV" p:speaker-ref="sony" p:price="2800000">
+	<!-- 스프링 JDBC 설정 -->
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-	<bean id="sony" class="tommy.spring.polymorphism.SonySpeaker"></bean>
-	<bean id="apple" class="tommy.spring.polymorphism.AppleSpeaker"></bean>  -->
+	<!-- Transction 설정 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="execution(* tommy.spring.web..*(..))" id="txPointcut" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+	</aop:config>
+
+	<!-- <bean id="log" class="tommy.spring.web.common.Log4JAdvice"></bean> 
+		<bean id="around" class="tommy.spring.web.common.AroundAdvice"></bean> <aop:config> 
+		<aop:pointcut expression="execution(* tommy.spring.web..*Impl.*(..))" id="allPointcut"/> 
+		<aop:pointcut expression="execution(* tommy.spring.web..*Impl.get*(..))" 
+		id="getPointcut"/> <aop:aspect ref="around"> <aop:around method="aroundLog" 
+		pointcut-ref="getPointcut" /> </aop:aspect> </aop:config> <bean id="userService" 
+		class="tommy.spring.web.user.impl.UserServiceImpl"> <property name="userDAO" 
+		ref="userDAO" /> </bean> <bean id="userDAO" class="tommy.spring.web.user.impl.UserDAO"></bean> 
+		<bean id="myLifeBean" class="tommy.spring.lifecycle.MyLifeBeanImpl" init-method="init"> 
+		<property name="greeting"><value>Hello, </value></property> </bean> <bean 
+		class="tommy.spring.lifecycle.CustomBeanPostProcessor"></bean> <context:component-scan 
+		base-package="tommy.spring.polymorphism"> </context:component-scan> <bean 
+		id="apple" class="tommy.spring.polymorphism.AppleSpeaker"></bean> <bean id="collectionBean" 
+		class="tommy.spring.collection.CollectionBean"> <property name="addressList"> 
+		<list> <value>서울시 서초구 서초동</value> <value>서울시 서초구 반포동</value> <value>서울시 동대문구 
+		장안동</value> </list> <map> <entry> <key><value>홍길동</value></key> <value>율도국</value> 
+		</entry> <entry> <key><value>손오공</value></key> <value>화과산</value> </entry> 
+		<entry> <key><value>삼장법사</value></key> <value>인도</value> </entry> </map> 
+		<set value-type="java.lang.String"> <value>서울시 서초구 서초동</value> <value>서울시 
+		동대문구 장안동</value> <value>서울시 동대문구 장안동</value> <value>서울시 서초구 반포동</value> </set> 
+		</property> </bean> <bean id="tv" class="tommy.spring.polymorphism.SamsungTV" 
+		p:speaker-ref="sony" p:price="2800000"> </bean> <bean id="sony" class="tommy.spring.polymorphism.SonySpeaker"></bean> 
+		<bean id="apple" class="tommy.spring.polymorphism.AppleSpeaker"></bean> -->
 </beans>
